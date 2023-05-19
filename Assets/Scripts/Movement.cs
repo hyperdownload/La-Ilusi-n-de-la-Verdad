@@ -5,45 +5,38 @@ using UnityEngine;
 public class Movement : MonoBehaviour
 {
     [SerializeField] private float speed = 10f;
-    [SerializeField] private float jumpForce = 10f;
-    [SerializeField] private float groundCheckRadius = 0.1f;
-    [SerializeField] private Transform groundCheckTransform;
-    [SerializeField] private LayerMask groundLayerMask;
 
-    private Rigidbody2D rb;
-    private bool isGrounded = false;
-
-    private void Start()
+    private Rigidbody2D playerRb;
+    private Vector2 moveInput;
+    private float angle;
+    void Start()
     {
-        rb = GetComponent<Rigidbody2D>();
+        playerRb = GetComponent<Rigidbody2D>();
     }
+    void Update() {
+        float moveX = Input.GetAxisRaw("Horizontal");
+        float moveY = Input.GetAxisRaw("Vertical");
+        moveInput = new Vector2(moveX, moveY);
+        if (Input.GetKeyDown(KeyCode.A)){
+            angle = -180;
+        }
+        if (Input.GetKeyDown(KeyCode.D)){
+            angle = 0;
+        }
+        // Al presionar "ESC" se cierra el juego instantaneamente.
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Application.Quit();
+        }
+        Quaternion rotation = Quaternion.Euler(new Vector3(0f, 0f, angle));
 
+        // Aplicar la rotación al transform del jugador
+        transform.rotation = rotation;
+    }
     private void FixedUpdate()
     {
-        // Get input
-        float horizontalInput = Input.GetAxisRaw("Horizontal");
-        bool jumpInput = Input.GetButtonDown("Jump");
+        playerRb.MovePosition(playerRb.position + moveInput * speed * Time.fixedDeltaTime);
 
-        // Move player horizontally
-        Vector2 velocity = rb.velocity;
-        velocity.x = horizontalInput * speed;
-        rb.velocity = velocity;
-
-        // Flip player sprite based on movement direction
-        if (horizontalInput != 0)
-        {
-            transform.localScale = new Vector3(horizontalInput > 0 ? 1 : -1, 1, 1);
-        }
-
-        // Check if player is grounded
-        isGrounded = Physics2D.OverlapCircle(groundCheckTransform.position, groundCheckRadius, groundLayerMask);
-
-        // Jump if grounded and jump button is pressed
-        if (isGrounded && jumpInput)
-        {
-            rb.AddForce(new Vector2(0, jumpForce), ForceMode2D.Impulse);
-            isGrounded = false;
-        }
     }
 }
 
