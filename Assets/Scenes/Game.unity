@@ -138,6 +138,7 @@ GameObject:
   - component: {fileID: 472733955}
   - component: {fileID: 472733956}
   - component: {fileID: 472733957}
+  - component: {fileID: 472733958}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -303,6 +304,18 @@ MonoBehaviour:
   audioSource: {fileID: 1127225229}
   footstepSounds: []
   footstepDelay: 0.5
+--- !u!114 &472733958
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 472733947}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0451e4a863446e4a9a59433c0a446c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 using UnityEngine;
 
 public class Movement : MonoBehaviour
@@ -23,10 +24,9 @@ public class Movement : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.D)){
             angle = 0;
         }
-        // Al presionar "ESC" se cierra el juego instantaneamente.
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            Application.Quit();
+            SceneManager.LoadScene("Menu");
         }
         Quaternion rotation = Quaternion.Euler(new Vector3(0f, 0f, angle));
 
