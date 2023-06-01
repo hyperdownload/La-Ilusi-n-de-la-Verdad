@@ -2,41 +2,102 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Movement : MonoBehaviour
 {
-    [SerializeField] private float speed = 10f;
+    //Life
+    public Image Life;
+    public float currentHealth = 100;
+    public float MaxLife = 100;
 
-    private Rigidbody2D playerRb;
-    private Vector2 moveInput;
-    private float angle;
+    // Movement variables
+    public float moveSpeed = 5f;
+    public float jumpForce = 5f;
+    public Transform groundCheck;
+    public LayerMask groundLayer;
+
+    // Sound variables
+    public AudioClip[] footstepSounds;
+    public float footstepInterval = 0.5f;
+
+    private int angle;
+    private bool isJumping = false;
+    private bool isGrounded = false;
+    private Rigidbody2D rb;
+    private AudioSource audioSource;
+    private float footstepTimer = 0f;
+    public static bool IsAlive;
+
     void Start()
     {
-        playerRb = GetComponent<Rigidbody2D>();
+        rb = GetComponent<Rigidbody2D>();
+        audioSource = GetComponent<AudioSource>();
+        IsAlive = true;
     }
-    void Update() {
-        float moveX = Input.GetAxisRaw("Horizontal");
-        float moveY = Input.GetAxisRaw("Vertical");
-        moveInput = new Vector2(moveX, moveY);
-        if (Input.GetKeyDown(KeyCode.A)){
-            angle = -180;
-        }
-        if (Input.GetKeyDown(KeyCode.D)){
-            angle = 0;
-        }
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            SceneManager.LoadScene("Menu");
-        }
-        Quaternion rotation = Quaternion.Euler(new Vector3(0f, 0f, angle));
 
-        // Aplicar la rotación al transform del jugador
-        transform.rotation = rotation;
-    }
-    private void FixedUpdate()
+    void Update()
     {
-        playerRb.MovePosition(playerRb.position + moveInput * speed * Time.fixedDeltaTime);
+        if (IsAlive)
+        {
+            float moveHorizontal = Input.GetAxis("Horizontal");
+            float moveVertical = Input.GetAxis("Vertical");
 
+            // Check if the character is on the ground
+            isGrounded = Physics2D.OverlapCircle(groundCheck.position, 0.2f, groundLayer);
+
+            // Horizontal movement
+            rb.velocity = new Vector2(moveHorizontal * moveSpeed, rb.velocity.y);
+
+            // Jump if the character is on the ground and the jump key is pressed
+            if (Input.GetButtonDown("Jump") && isGrounded)
+            {
+                rb.AddForce(new Vector2(0f, jumpForce), ForceMode2D.Impulse);
+            }
+
+            // Play footsteps sound if the character is on the ground and moving
+            if (isGrounded && Mathf.Abs(moveHorizontal) > 0f)
+            {
+                footstepTimer += Time.deltaTime;
+                if (footstepTimer >= footstepInterval)
+                {
+                    footstepTimer = 0f;
+                    PlayRandomFootstepSound();
+                }
+            }
+
+            if (Input.GetKey(KeyCode.Escape))
+            {
+                SceneManager.LoadScene("Menu");
+            }
+        }
+        else
+        {
+            if (Input.GetKey(KeyCode.P))
+            {
+                SceneManager.LoadScene("Game");
+            }
+        }
+    }
+
+    public void TakeDamage(int damage)
+    {
+        currentHealth -= damage;
+        Life.fillAmount = currentHealth / MaxLife;
+        if (currentHealth <= 0)
+        {
+            IsAlive = false;
+        }
+    }
+
+    private void PlayRandomFootstepSound()
+    {
+        if (footstepSounds.Length > 0)
+        {
+            int randomIndex = Random.Range(0, footstepSounds.Length);
+            audioSource.clip = footstepSounds[randomIndex];
+            audioSource.Play();
+        }
     }
 }
 
